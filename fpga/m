@@ -1,0 +1,32 @@
+NSLINCDIR=../src/
+NSLOPT=-O2 -neg_res -I$(NSLINCDIR)
+PROJECT=DE10
+NSL2VL=nsl2vl
+PROJTCL=setup_proj.tcl  
+Q2SH=quartus_sh
+Q2PG=quartus_pgm
+CABLE="USB-Blaster"
+PMODE=JTAG
+TOP=$(PROJECT).nsl
+TMPDIR=tmp
+
+$(PROJECT).v: 
+	$(NSL2VL) $(NSLOPT) -o $(PROJECT).v $(TOP)
+$(PROJECT).qsf: $(PROJECT).v
+	$(Q2SH) -t $(PROJTCL) -project $(PROJECT) 
+$(PROJECT).sof: $(PROJECT).qsf
+	$(Q2SH) --flow compile $(PROJECT)
+download: 
+	$(Q2PG) -c $(CABLE) -m $(PMODE) -o "p;$(TMPDIR)/$(PROJECT).sof"
+all:
+	@if [ ! -d $(TMPDIR) ]; then \
+		echo mkdir $(TMPDIR); \
+		mkdir $(TMPDIR); \
+	fi
+	( cd $(TMPDIR); make -f ../Makefile NSLINCDIR=../$(NSLINCDIR) PROJTCL=../$(PROJTCL) TOP=../$(TOP) compile)
+compile: $(PROJECT).sof
+$(VSRC):
+	
+clean:
+	rm -rf $(TMPDIR) $(PROJECT).v 
+	

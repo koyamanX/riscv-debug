@@ -1,0 +1,37 @@
+#include "dtm.h"
+
+module dtm {
+	reg ir[5] = IDCODE;	/* IDECODE (defined by spec) */
+	reg idcode[32];
+	reg bypass = 0;
+	dtmcs_t reg dtmcs = {14'b00000000000000, 1'b0, 1'b0, 1'b0, 3'b000, 2'b00, DTMCS_ABITS, DTMCS_VERSION};
+
+	func virtual_state_uir {
+		ir := ir_in;
+	}
+	func virtual_state_cir {
+		ir_out = IDCODE;
+	}
+	func virtual_state_udr {
+	}
+	func virtual_state_cdr {
+		any {
+			ir == DTMCS: dtmcs := {dtmcs[31:10], DTMCS_ABITS, DTMCS_VERSION};
+			ir == BYPASS: bypass := 1'b0;
+		}
+	}
+	func virtual_state_sdr {
+		any {
+			ir == DTMCS: dtmcs := {tdi, dtmcs[31:1]};
+			else: bypass := tdi;
+		}
+	}
+	any {
+		ir == DTMCS: tdo = dtmcs[0];
+		else: tdo = bypass;
+	}
+
+#ifdef DEBUG
+	debug_out = dtmcs;
+#endif
+}

@@ -1,0 +1,38 @@
+#include "vjtag.h"
+#include "../src/dtm.nsl"
+
+declare DE10 {
+	output LEDR[10];
+}
+module DE10 {
+	vjtag vjtag0;
+	dtm riscv_dtm;
+
+	riscv_dtm.m_clock = vjtag0.tck;
+	riscv_dtm.p_reset = p_reset;
+	riscv_dtm.ir_in = vjtag0.ir_in;
+	vjtag0.ir_out = riscv_dtm.ir_out;
+	riscv_dtm.tdi = vjtag0.tdi;
+	vjtag0.tdo = riscv_dtm.tdo;
+
+	func vjtag0.virtual_state_cdr {
+		riscv_dtm.virtual_state_cdr();
+	}
+	func vjtag0.virtual_state_sdr {
+		riscv_dtm.virtual_state_sdr();
+	}
+	func vjtag0.virtual_state_udr {
+		riscv_dtm.virtual_state_udr();
+	}
+	func vjtag0.virtual_state_cir {
+		riscv_dtm.virtual_state_cir();
+	}
+	func vjtag0.virtual_state_uir {
+		riscv_dtm.virtual_state_uir();
+	}
+
+#ifdef DEBUG
+	LEDR = riscv_dtm.debug_out;
+#endif
+}
+
