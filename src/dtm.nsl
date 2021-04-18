@@ -2,9 +2,10 @@
 
 module dtm {
 	reg ir[5] = IDCODE;	/* IDECODE (defined by spec) */
-	reg idcode[32];
+	reg idcode[32] = 0x10e31913;	/* same as SiFive's */
 	reg bypass = 0;
 	dtmcs_t reg dtmcs = {14'b00000000000000, 1'b0, 1'b0, 1'b0, 3'b000, 2'b00, DTMCS_ABITS, DTMCS_VERSION};
+	dmi_t reg dmi = 0;
 
 	func virtual_state_uir {
 		ir := ir_in;
@@ -13,21 +14,31 @@ module dtm {
 		ir_out = IDCODE;
 	}
 	func virtual_state_udr {
+		/* At this point, we can issue abstarct command */
 	}
 	func virtual_state_cdr {
 		any {
 			ir == DTMCS: dtmcs := {dtmcs[31:10], DTMCS_ABITS, DTMCS_VERSION};
+			ir == DMI: dmi := 66'(1'b0);
+			ir == IDCODE: idcode := 0x10e31913;
 			ir == BYPASS: bypass := 1'b0;
+			else: bypass := 1'b0;
 		}
 	}
 	func virtual_state_sdr {
 		any {
 			ir == DTMCS: dtmcs := {tdi, dtmcs[31:1]};
+			ir == DMI: dmi := {tdi, dmi[65:1]};
+			ir == IDCODE: idcode := {tdi, idcode[31:1]};
+			ir == BYPASS: bypass := tdi;
 			else: bypass := tdi;
 		}
 	}
 	any {
 		ir == DTMCS: tdo = dtmcs[0];
+		ir == DMI: tdo = dmi[0];
+		ir == BYPASS: tdo = bypass;
+		ir == IDCODE: tdo = idcode[0];
 		else: tdo = bypass;
 	}
 

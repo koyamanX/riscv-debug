@@ -6,7 +6,8 @@
 
 #define IDCODE		5'b00001
 #define DTMCS		5'b10000
-#define BYPASS		5'b00000
+#define DMI			5'b10001
+#define BYPASS		5'b11111
 
 #define DTMCS_VERSION	4'b0001
 #define DTMCS_ABITS		6'b011111
@@ -20,6 +21,12 @@ struct dtmcs_t {
 	dmistat[2];
 	abits[6];
 	version[4];
+};
+
+struct dmi_t {
+	op[2];
+	data[32];
+	address[32];
 };
 
 declare dtm interface {
