@@ -20,6 +20,7 @@
 #define DMI_STAT_SUCCESS	2'b00
 #define DMI_STAT_RESERVED	2'b01
 #define DMI_STAT_FAILURE	2'b10
+#define DMI_STAT_INPROGRESS	2'b11
 
 struct dtmcs_t {
 	zero1[14];
@@ -35,7 +36,7 @@ struct dtmcs_t {
 struct dmi_t {
 	op[2];
 	data[32];
-	address[32];
+	addr[32];
 };
 
 declare dtm interface {
@@ -54,6 +55,14 @@ declare dtm interface {
 	func_in	virtual_state_udr;
 	func_in	virtual_state_cir;
 	func_in	virtual_state_uir;
+
+	/* DMI */
+	output addr[32];
+	input rdata[32];
+	output wdata[32];
+	func_out read(addr);
+	func_out write(addr, wdata);
+	func_in ready(rdata);
 
 #ifdef DEBUG
 	output debug_out[32];

@@ -18,6 +18,8 @@ module dtm {
 	dmi_t reg dmi = 0;
 	/* DMI internal register for read via dmi(Capture-DR) */
 	reg dmi_op_stat[2] = 0;
+	reg dmi_addr[32] = 0;
+	reg dmi_data[32] = 0;
 
 	func virtual_state_uir {
 		ir := ir_in;
@@ -40,18 +42,42 @@ module dtm {
 			ir == DMI: {
 				any {
 					dmi.op == DMI_NOP: {dmi_op_stat := DMI_STAT_FAILURE;}
-					dmi.op == DMI_READ: {dmi_op_stat := DMI_STAT_FAILURE;}
-					dmi.op == DMI_WRITE: {dmi_op_stat := DMI_STAT_FAILURE;}
+					dmi.op == DMI_READ: {
+						dmi_addr := dmi.addr;
+						
+						if(!operation_in_progress) {
+							operation_in_progress := 1;
+							read(dmi.addr);
+						} else {
+							dmi_op_stat := DMI_STAT_INPROGRESS;
+						}
+					}
+					dmi.op == DMI_WRITE: {
+						dmi_addr := dmi.addr;
+						dmi_data := dmi.data;
+
+						if(!operation_in_progress) {
+							operation_in_progress := 1;
+							write(dmi.addr, dmi.data);
+						} else {
+							dmi_op_stat := DMI_STAT_INPROGRESS;
+						}
+					}
 					dmi.op == DMI_RESERVED: {dmi_op_stat := DMI_STAT_FAILURE;}
 				}
 			}
 		}
 	}
+	func ready {
+		operation_in_progress := 0;
+		dmi_data := rdata;
+		dmi_op_stat := DMI_STAT_SUCCESS;
+	}
 	func virtual_state_cdr {
 		any {
 			ir == DTMCS: dtmcs := {14'(1'b0), dtmcs_dmihardreset, dtmcs_dmireset, 1'b0, 
 									dtmcs_idle, dtmcs_dmistat, DTMCS_ABITS, DTMCS_VERSION};
-			ir == DMI: dmi := {64'(1'b0), dmi_op_stat};
+			ir == DMI: dmi := {dmi_addr, dmi_data, dmi_op_stat};
 			ir == IDCODE: idcode := 0x10e31913;
 			ir == BYPASS: bypass := 1'b0;
 			else: bypass := 1'b0;
