@@ -4,8 +4,20 @@ module dtm {
 	reg ir[5] = IDCODE;	/* IDECODE (defined by spec) */
 	reg idcode[32] = 0x10e31913;	/* same as SiFive's */
 	reg bypass = 0;
+	
+	/* Indicates DTM sent request to DM, but DM is still doing its job */
+	reg operation_in_progress = 0;
+	/* DTMCS register */
 	dtmcs_t reg dtmcs = {14'b00000000000000, 1'b0, 1'b0, 1'b0, 3'b000, 2'b00, DTMCS_ABITS, DTMCS_VERSION};
+	/* DTMCS internal register for read via dtmcs(Capture-DR) */
+	reg dtmcs_dmistat[2] = 0;
+	reg dtmcs_idle[3] = 0;
+	reg dtmcs_dmireset = 0;
+	reg dtmcs_dmihardreset = 0;
+	/* DMI register */
 	dmi_t reg dmi = 0;
+	/* DMI internal register for read via dmi(Capture-DR) */
+	reg dmi_op_stat[2] = 0;
 
 	func virtual_state_uir {
 		ir := ir_in;
@@ -15,11 +27,31 @@ module dtm {
 	}
 	func virtual_state_udr {
 		/* At this point, we can issue abstarct command */
+		any {
+			ir == DTMCS: {
+				/* TODO: Implement hardreset */
+				if(dtmcs.dmihardreset) {
+					dtmcs_dmireset := 0;
+				} else if(dtmcs.dmireset) {
+					dtmcs_dmireset := 0;
+					dmi_op_stat := 0;
+				}
+			}
+			ir == DMI: {
+				any {
+					dmi.op == DMI_NOP: {dmi_op_stat := DMI_STAT_FAILURE;}
+					dmi.op == DMI_READ: {dmi_op_stat := DMI_STAT_FAILURE;}
+					dmi.op == DMI_WRITE: {dmi_op_stat := DMI_STAT_FAILURE;}
+					dmi.op == DMI_RESERVED: {dmi_op_stat := DMI_STAT_FAILURE;}
+				}
+			}
+		}
 	}
 	func virtual_state_cdr {
 		any {
-			ir == DTMCS: dtmcs := {dtmcs[31:10], DTMCS_ABITS, DTMCS_VERSION};
-			ir == DMI: dmi := 66'(1'b0);
+			ir == DTMCS: dtmcs := {14'(1'b0), dtmcs_dmihardreset, dtmcs_dmireset, 1'b0, 
+									dtmcs_idle, dtmcs_dmistat, DTMCS_ABITS, DTMCS_VERSION};
+			ir == DMI: dmi := {64'(1'b0), dmi_op_stat};
 			ir == IDCODE: idcode := 0x10e31913;
 			ir == BYPASS: bypass := 1'b0;
 			else: bypass := 1'b0;

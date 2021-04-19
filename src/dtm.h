@@ -12,6 +12,15 @@
 #define DTMCS_VERSION	4'b0001
 #define DTMCS_ABITS		6'b011111
 
+#define DMI_NOP			2'b00
+#define DMI_READ		2'b01
+#define DMI_WRITE		2'b10
+#define DMI_RESERVED	2'b11
+
+#define DMI_STAT_SUCCESS	2'b00
+#define DMI_STAT_RESERVED	2'b01
+#define DMI_STAT_FAILURE	2'b10
+
 struct dtmcs_t {
 	zero1[14];
 	dmihardreset[1];
