@@ -1,0 +1,20 @@
+#include "dm.h"
+module dm {
+	reg dmcontrol[32] = 0;
+	func write {
+		any {
+			addr == 0x10: dmcontrol := wdata;
+		}
+		ready();
+	}
+	func read {
+		any {
+			addr == 0x10: rdata = dmcontrol;
+		}
+		ready();
+	}
+
+#ifdef DEBUG
+	debug_out = dmcontrol;
+#endif
+}

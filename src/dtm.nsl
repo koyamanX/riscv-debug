@@ -5,8 +5,6 @@ module dtm {
 	reg idcode[32] = 0x10e31913;	/* same as SiFive's */
 	reg bypass = 0;
 	
-	/* Indicates DTM sent request to DM, but DM is still doing its job */
-	reg operation_in_progress = 0;
 	/* DTMCS register */
 	dtmcs_t reg dtmcs = {14'b00000000000000, 1'b0, 1'b0, 1'b0, 3'b000, 2'b00, DTMCS_ABITS, DTMCS_VERSION};
 	/* DTMCS internal register for read via dtmcs(Capture-DR) */
@@ -41,27 +39,15 @@ module dtm {
 			}
 			ir == DMI: {
 				any {
-					dmi.op == DMI_NOP: {dmi_op_stat := DMI_STAT_FAILURE;}
+					dmi.op == DMI_NOP: {dmi_op_stat := DMI_STAT_SUCCESS;}
 					dmi.op == DMI_READ: {
 						dmi_addr := dmi.addr;
-						
-						if(!operation_in_progress) {
-							operation_in_progress := 1;
-							read(dmi.addr);
-						} else {
-							dmi_op_stat := DMI_STAT_INPROGRESS;
-						}
+						read(dmi.addr);
 					}
 					dmi.op == DMI_WRITE: {
 						dmi_addr := dmi.addr;
 						dmi_data := dmi.data;
-
-						if(!operation_in_progress) {
-							operation_in_progress := 1;
-							write(dmi.addr, dmi.data);
-						} else {
-							dmi_op_stat := DMI_STAT_INPROGRESS;
-						}
+						write(dmi.addr, dmi.data);
 					}
 					dmi.op == DMI_RESERVED: {dmi_op_stat := DMI_STAT_FAILURE;}
 				}
@@ -69,7 +55,6 @@ module dtm {
 		}
 	}
 	func ready {
-		operation_in_progress := 0;
 		dmi_data := rdata;
 		dmi_op_stat := DMI_STAT_SUCCESS;
 	}

@@ -10,7 +10,7 @@
 #define BYPASS		5'b11111
 
 #define DTMCS_VERSION	4'b0001
-#define DTMCS_ABITS		6'b011111
+#define DTMCS_ABITS		6'b100000
 
 #define DMI_NOP			2'b00
 #define DMI_READ		2'b01
@@ -34,9 +34,9 @@ struct dtmcs_t {
 };
 
 struct dmi_t {
-	op[2];
-	data[32];
 	addr[32];
+	data[32];
+	op[2];
 };
 
 declare dtm interface {
@@ -62,7 +62,7 @@ declare dtm interface {
 	output wdata[32];
 	func_out read(addr);
 	func_out write(addr, wdata);
-	func_in ready(rdata);
+	func_in ready();
 
 #ifdef DEBUG
 	output debug_out[32];
