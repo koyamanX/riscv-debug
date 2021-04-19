@@ -1,12 +1,15 @@
 #include "vjtag.h"
-#include "../src/dtm.nsl"
+#include "dtm.h"
+#include "dm.h"
 
 declare DE10 {
+	input SW[10];
 	output LEDR[10];
 }
 module DE10 {
 	vjtag vjtag0;
 	dtm riscv_dtm;
+	dm riscv_dm;
 
 	riscv_dtm.m_clock = vjtag0.tck;
 	riscv_dtm.p_reset = p_reset;
@@ -14,6 +17,9 @@ module DE10 {
 	vjtag0.ir_out = riscv_dtm.ir_out;
 	riscv_dtm.tdi = vjtag0.tdi;
 	vjtag0.tdo = riscv_dtm.tdo;
+
+	riscv_dm.m_clock = vjtag0.tck;
+	riscv_dm.p_reset = p_reset;
 
 	func vjtag0.virtual_state_cdr {
 		riscv_dtm.virtual_state_cdr();
@@ -30,9 +36,23 @@ module DE10 {
 	func vjtag0.virtual_state_uir {
 		riscv_dtm.virtual_state_uir();
 	}
+	func riscv_dtm.read {
+		riscv_dm.read(riscv_dtm.addr);
+	}
+	func riscv_dtm.write {
+		riscv_dm.write(riscv_dtm.addr, riscv_dtm.wdata);
+	}
+	func riscv_dm.ready {
+		riscv_dtm.rdata = riscv_dm.rdata;
+		riscv_dtm.ready();
+	}
 
 #ifdef DEBUG
-	LEDR = riscv_dtm.debug_out;
+	any {
+		SW == 0: LEDR = riscv_dtm.debug_out;
+		SW == 1: LEDR = riscv_dm.debug_out;
+		else:	LEDR = 0xffffffff;
+	}
 #endif
 }
 
