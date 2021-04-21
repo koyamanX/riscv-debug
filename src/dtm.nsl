@@ -73,8 +73,9 @@ module dtm {
 			ir == DTMCS: dtmcs := {tdi, dtmcs[31:1]};
 			ir == DMI: dmi := {tdi, dmi[65:1]};
 			ir == IDCODE: idcode := {tdi, idcode[31:1]};
-			ir == BYPASS: bypass := tdi;
-			else: bypass := tdi;
+			/* Bypass register is read-only */
+			ir == BYPASS: ; //bypass := tdi;
+			else: ; //bypass := tdi;
 		}
 	}
 	any {
