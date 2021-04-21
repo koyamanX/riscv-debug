@@ -16,4 +16,83 @@ declare dm interface {
 	output debug_out[32];
 #endif
 }
+
+#define DATA0			0x04
+#define DATA1			0x05
+#define DATA2			0x06
+#define DATA3			0x07
+#define DATA4			0x08
+#define DATA5			0x09
+#define DATA6			0x0a
+#define DATA7			0x0b
+#define DATA8			0x0c
+#define DATA9			0x0d
+#define DATA10			0x0e
+#define DATA11			0x0f
+#define DMCONTROL		0x10
+#define DMSTATUS		0x11
+#define HARTINFO		0x12
+#define HALTSUM1		0x13
+#define HAWINDOWSEL		0x14
+#define HAWINDOW		0x15
+#define ABSTRACTCS		0x16
+#define COMMAND			0x17
+#define ABSTRACTAUTO	0x18
+#define CONFSTRPTR0		0x19
+#define CONFSTRPTR1		0x1a
+#define CONFSTRPTR2		0x1b
+#define CONFSTRPTR3		0x1c
+#define NEXTDM			0x1d
+#define CUSTOM			0x1f
+#define PROGBUF0		0x20
+#define PROGBUF1		0x21
+#define PROGBUF2		0x22
+#define PROGBUF3		0x23
+#define PROGBUF4		0x24
+#define PROGBUF5		0x25
+#define PROGBUF6		0x26
+#define PROGBUF7		0x27
+#define PROGBUF8		0x28
+#define PROGBUF9		0x29
+#define PROGBUF10		0x2a
+#define PROGBUF11		0x2b
+#define PROGBUF12		0x2c
+#define PROGBUF13		0x2d
+#define PROGBUF14		0x2e
+#define PROGBUF15		0x2f
+#define AUTHDATA		0x30
+/* empty 0x31 */
+#define DMCS2			0x32
+/* empty 0x33 */
+#define HALTSUM2		0x34
+#define HALTSUM3		0x35
+/* empty 0x36 */
+#define SBADDRESS3		0x37
+#define SBCS			0x38
+#define SBADDRESS0		0x39
+#define SBADDRESS1		0x3a
+#define SBADDRESS2		0x3b
+#define	SBDATA0			0x3c
+#define	SBDATA1			0x3d
+#define	SBDATA2			0x3e
+#define	SBDATA3			0x3f
+#define HALTSUM0		0x40
+/* empty 0x41 ~ 0x6f */
+#define CUSTOM0			0x70
+#define CUSTOM1			0x71
+#define CUSTOM2			0x72
+#define CUSTOM3			0x73
+#define CUSTOM4			0x74
+#define CUSTOM5			0x75
+#define CUSTOM6			0x76
+#define CUSTOM7			0x77
+#define CUSTOM8			0x78
+#define CUSTOM9			0x79
+#define CUSTOM10		0x7a
+#define CUSTOM11		0x7b
+#define CUSTOM12		0x7c
+#define CUSTOM13		0x7d
+#define CUSTOM14		0x7e
+#define CUSTOM15		0x7f
+
 #endif
