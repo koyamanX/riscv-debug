@@ -95,4 +95,61 @@ declare dm interface {
 #define CUSTOM14		0x7e
 #define CUSTOM15		0x7f
 
+/* Read-only */
+struct dmstatus_t {
+	/* Hardwired to zero */
+	zero0[7];
+	/* `udmresetpending`
+		0: Unimplemented, or `ndmreset` is zero and no ndmreset is currently in progress.
+		1: `ndmreset` is currently nonzero, or there is an ndmreset in progress.
+	*/
+	ndmresetpending[1];
+	/* `stickyunavail`
+		0: The per-hart unavail bits reflect the current state of the hart.
+		1: The per-hart unavail bits are sticky. Once they are set, they will not clear
+			until the debugger acknowleges them using `ackunavail`.
+	*/
+	stickyunavail[1];
+	/* `impebreak`
+		1: There is an implict `ebreak` instruction at the non-existent word immediately after
+			the Program Buffer. This saves the debugger from having to write the `ebreak` itself,
+			and allows the Program Buffer to be one word smaller.
+		This must be 1 when `progbufsize` is 1.
+	*/
+	impebreak[1];
+	/* Hardwired to zero */
+	zero1[2];
+	/* `allhavereset`
+		1: All currently selected harts have been reset and reset has not been acknowleged
+			for any of them.
+	*/
+	allhavereset[1];
+	/* `anyhavereset`
+		1: At least one currently selected harts have been reset and reset has not been acknowleged
+			for that hart.
+	*/
+	anyhavereset[1];
+	/* `allresumeack`
+		1: All currently selected harts have acknowleged their last resume request.
+	*/
+	allresumeack[1];
+	/* `anyresumeack`
+		1: Any currently selected hart has acknowleged its last resume request.
+	*/
+	anyresumeack[1];
+	allnonexistent[1];
+	anynonexistent[1];
+	allunavail[1];
+	anyunavail[1];
+	allrunning[1];
+	anyrunning[1];
+	allhalted[1];
+	anyhalted[1];
+	authenticated[1];
+	authbusy[1];
+	hasresethaltreq[1];
+	confstrptrvalid[1];
+	version[4];
+};
+
 #endif
