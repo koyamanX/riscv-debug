@@ -1,3 +1,5 @@
 [submodule "riscv-openocd"]
 	path = riscv-openocd
 	url = https://github.com/koyamanX/riscv-openocd.git
+[submodule "riscv-openocd"]
+	ignore = dirty
