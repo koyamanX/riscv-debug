@@ -9,5 +9,5 @@ docker run -it \
     --privileged \
     -v /sys:/sys:ro \
     -v /opt/intelFPGA_lite:/opt/intelFPGA_lite \
-	-v $(pwd):/home/user \
+	-v $(pwd):/root \
     koyaman/riscv-debug-dev:1.0 $1

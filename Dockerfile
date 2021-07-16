@@ -7,8 +7,8 @@ ENV QUARTUS=/opt/intelFPGA_lite/20.1/quartus/bin
 # Install directory for RISCV toolchain
 ENV RISCV=/opt/riscv
 ENV PATH=$RISCV/bin:$QUARTUS:$NSLCORE:$PATH
-ENV USER=user
-ENV HOME=/home/user
+ENV USER=root
+ENV HOME=/root
 ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR ${HOME}
@@ -18,7 +18,4 @@ RUN mkdir -p /opt/nslcore
 RUN curl https://ip-arch.jp/unsupported/nslcore-x86_64-linux-20210228-90.tar.gz | tar xvz -C /opt/nslcore
 WORKDIR ${NSLCORE}
 
-RUN useradd user
 WORKDIR ${HOME}
-RUN chown -R user: /opt
-USER ${USER}
